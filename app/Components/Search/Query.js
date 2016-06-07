@@ -14,7 +14,8 @@ var Query = React.createClass({
 		if (!term) {
 	    	return;
 	    }
-		runSearch(term);
+		// runSearch(term);
+		this.props.callbackParent(term)
 		this.setState({term: ''})
 	},
 	render: function(){
