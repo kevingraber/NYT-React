@@ -21246,115 +21246,135 @@
 /* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	var React = __webpack_require__(1);
+	var axios = __webpack_require__(162);
 
 	var Results = React.createClass({
-		displayName: "Results",
+		displayName: 'Results',
 
+		getInitialState: function getInitialState() {
+			return {
+				articles: []
+			};
+		},
+		componentDidMount: function componentDidMount() {
+			console.log("MOUNTED");
+
+			var term = "obama";
+			axios.get("https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=f00d8dbd623a99f7d310810bf38cff90:9:74629258&q=" + term).then(function (results) {
+				// console.log(results)
+				// for (var i = 0; i < results.data.response.docs.length; i++) {
+				// 	console.log(results.data.response.docs[i].headline.main)
+				// }
+				this.setState({
+					articles: results.data.response.docs
+				});
+				console.log(this);
+				console.log(this.state);
+			}.bind(this));
+
+			/*Here we run our getGithubInfo function (from our helpers)*/
+			// helpers.getGithubInfo(this.props.params.username)
+			// 	.then(function(data){
+
+			// 		/*Once we get a response from GitHub,
+			// 		we dump the contents into the components bio and repos "state" variables*/
+			// 		this.setState({
+			// 			bio: data.bio,
+			// 			repos: data.repos
+			// 		})
+			// 	// This bind function allows us to reference the higher level this
+			// 	// and not the "this" in the smaller context function.
+			// 	}.bind(this))
+		},
 		render: function render() {
+			var
+
+			// Map the repos and loop through
+			// When we map an array we effectively say... loop through each repo
+			// and perform the code in the function.
+			// So in this case we are creating an array called "repos"
+			// which holds a series of HTML divs displaying lists.
+			// repos = [<div>...</div>, <div>...</div>, <div>...</div>, <div>...</div>]
+			articledata = this.state.articles.map(function (article, index) {
+				return React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'li',
+						{ className: 'list-group-item', key: index },
+						React.createElement(
+							'h3',
+							null,
+							article.headline.main && React.createElement(
+								'span',
+								null,
+								React.createElement(
+									'em',
+									null,
+									article.headline.main
+								)
+							),
+							React.createElement(
+								'span',
+								{ className: 'btn-group pull-right' },
+								article.web_url && React.createElement(
+									'a',
+									{ href: article.web_url, className: 'btn btn-default' },
+									'View Article'
+								),
+								React.createElement(
+									'button',
+									{ className: 'btn btn-primary' },
+									'Save'
+								)
+							)
+						),
+						article.pub_date && React.createElement(
+							'p',
+							null,
+							'Date Published: ',
+							article.pub_date
+						)
+					)
+				);
+			});
 
 			return React.createElement(
-				"div",
-				{ className: "row" },
+				'div',
+				{ className: 'row' },
 				React.createElement(
-					"div",
-					{ className: "col-lg-12" },
+					'div',
+					{ className: 'col-lg-12' },
 					React.createElement(
-						"div",
-						{ className: "panel panel-primary" },
+						'div',
+						{ className: 'panel panel-primary' },
 						React.createElement(
-							"div",
-							{ className: "panel-heading" },
+							'div',
+							{ className: 'panel-heading' },
 							React.createElement(
-								"h1",
-								{ className: "panel-title" },
+								'h1',
+								{ className: 'panel-title' },
 								React.createElement(
-									"strong",
+									'strong',
 									null,
-									React.createElement("i", { className: "fa fa-list-alt" }),
-									"  Results"
+									React.createElement('i', { className: 'fa fa-list-alt' }),
+									'  Results'
 								)
 							)
 						),
 						React.createElement(
-							"div",
-							{ className: "panel-body" },
+							'div',
+							{ className: 'panel-body' },
 							React.createElement(
-								"ul",
-								{ className: "list-group" },
+								'ul',
+								{ className: 'list-group' },
 								React.createElement(
-									"li",
-									{ className: "list-group-item" },
-									React.createElement(
-										"h3",
-										null,
-										React.createElement(
-											"span",
-											null,
-											React.createElement(
-												"em",
-												null,
-												"Aliens Invade Paris"
-											)
-										),
-										React.createElement(
-											"span",
-											{ className: "btn-group pull-right" },
-											React.createElement(
-												"button",
-												{ className: "btn btn-default " },
-												"View Article"
-											),
-											React.createElement(
-												"button",
-												{ className: "btn btn-primary" },
-												"Save"
-											)
-										)
-									),
-									React.createElement(
-										"p",
-										null,
-										"Date Published: 03/15/16"
-									)
-								),
-								React.createElement(
-									"li",
-									{ className: "list-group-item" },
-									React.createElement(
-										"h3",
-										null,
-										React.createElement(
-											"span",
-											null,
-											React.createElement(
-												"em",
-												null,
-												"Obama Gives Commencement Speech"
-											)
-										),
-										React.createElement(
-											"span",
-											{ className: "btn-group pull-right" },
-											React.createElement(
-												"button",
-												{ className: "btn btn-default " },
-												"View Article"
-											),
-											React.createElement(
-												"button",
-												{ className: "btn btn-primary" },
-												"Save"
-											)
-										)
-									),
-									React.createElement(
-										"p",
-										null,
-										"Date Published: 03/15/16"
-									)
+									'li',
+									{ className: 'list-group-item' },
+									articledata
 								)
 							)
 						)
@@ -21362,6 +21382,19 @@
 				)
 			);
 		}
+
+		/*Note the above code isn't what was getting rendered by the component*/
+		/*The above "return" was simply to build the repos array.
+	 What ultimately gets rendered by the component is the "repos" array */
+		// return (
+		// 	<div>
+		// 		<h3> User Repos </h3>
+		// 		<ul className="list-group">
+		// 			{repos}
+		// 		</ul>
+		// 	</div>
+		// )
+
 	});
 
 	module.exports = Results;
