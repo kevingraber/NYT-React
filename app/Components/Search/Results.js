@@ -10,19 +10,19 @@ var Results = React.createClass({
 	componentDidMount: function(){
 		console.log("MOUNTED");
 
-		var term = "obama";
-		axios.get("https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=f00d8dbd623a99f7d310810bf38cff90:9:74629258&q=" + term)
-			.then(function(results){
-				// console.log(results)
-				// for (var i = 0; i < results.data.response.docs.length; i++) {
-				// 	console.log(results.data.response.docs[i].headline.main)
-				// }
-				this.setState({
-					articles: results.data.response.docs
-				})
-				console.log(this)
-				console.log(this.state)
-		}.bind(this))
+		// var term = "obama";
+		// axios.get("https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=f00d8dbd623a99f7d310810bf38cff90:9:74629258&q=" + term)
+		// 	.then(function(results){
+		// 		// console.log(results)
+		// 		// for (var i = 0; i < results.data.response.docs.length; i++) {
+		// 		// 	console.log(results.data.response.docs[i].headline.main)
+		// 		// }
+		// 		this.setState({
+		// 			articles: results.data.response.docs
+		// 		})
+		// 		console.log(this)
+		// 		console.log(this.state)
+		// }.bind(this))
 
 		/*Here we run our getGithubInfo function (from our helpers)*/
 		// helpers.getGithubInfo(this.props.params.username)
@@ -38,7 +38,13 @@ var Results = React.createClass({
 		// 	// and not the "this" in the smaller context function.
 		// 	}.bind(this))
 	},
+	componentDidUpdate: function(){
+		console.log(this.props)
+	},
 	render: function(){
+
+		console.log('this is rendering')
+		console.log("this.props in results.js", this.props)
 
 		// Map the repos and loop through
 		// When we map an array we effectively say... loop through each repo
@@ -46,7 +52,7 @@ var Results = React.createClass({
 		// So in this case we are creating an array called "repos" 
 		// which holds a series of HTML divs displaying lists. 
 		// repos = [<div>...</div>, <div>...</div>, <div>...</div>, <div>...</div>]
-		var articledata = this.state.articles.map(function(article, index){
+		var articledata = this.props.info.map(function(article, index){
 			return(
 
 				<div>

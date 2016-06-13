@@ -19980,15 +19980,42 @@
 	var React = __webpack_require__(1);
 	var Query = __webpack_require__(161);
 	var Results = __webpack_require__(181);
+	var axios = __webpack_require__(162);
 
 	var Search = React.createClass({
 		displayName: 'Search',
 
 		getInitialState: function getInitialState() {
-			return { term: '' };
+			return { term: '', startyear: '', endyear: '', articles: [] };
 		},
-		getSearchTerms: function getSearchTerms(newTerm) {
-			this.setState({ term: newTerm });
+		getSearchTerms: function getSearchTerms(newTerm, newStartYear, newEndYear) {
+			this.setState({ term: newTerm, startyear: newStartYear, endyear: newEndYear });
+		},
+		componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+			console.log("I updated");
+			console.log(this.state.term);
+			console.log(prevState);
+
+			if (this.state.term != prevState.term && this.state.startyear != prevState.startyear && this.state.endyear != prevState.endyear) {
+
+				console.log("this.state before call", this.state);
+				console.log("prevState", prevState);
+
+				var term = this.state.term;
+				var startyear = this.state.startyear;
+				var endyear = this.state.endyear;
+				axios.get("https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=6bf10a490ee83a145d4ecc123e091d3a:17:74629258&q=" + term + "&begin_date=" + startyear + "0101&end_date=" + endyear + "1231").then(function (results) {
+					// console.log(results)
+					// for (var i = 0; i < results.data.response.docs.length; i++) {
+					// 	console.log(results.data.response.docs[i].headline.main)
+					// }
+					this.setState({
+						articles: results.data.response.docs
+					});
+					console.log(this);
+					console.log(this.state);
+				}.bind(this));
+			}
 		},
 		render: function render() {
 			console.log(this);
@@ -20003,7 +20030,7 @@
 				React.createElement(
 					'div',
 					{ className: 'col-lg-12' },
-					React.createElement(Results, null)
+					React.createElement(Results, { info: this.state.articles })
 				)
 			);
 		}
@@ -20024,20 +20051,29 @@
 		displayName: 'Query',
 
 		getInitialState: function getInitialState() {
-			return { term: '' };
+			return { term: '', startyear: '', endyear: '' };
 		},
 		handleTermChange: function handleTermChange(e) {
 			this.setState({ term: e.target.value });
 		},
+		handleStartYearChange: function handleStartYearChange(e) {
+			this.setState({ startyear: e.target.value });
+		},
+		handleEndYearChange: function handleEndYearChange(e) {
+			this.setState({ endyear: e.target.value });
+		},
 		handleSubmit: function handleSubmit(e) {
 			e.preventDefault();
 			var term = this.state.term.trim();
-			if (!term) {
+			var startyear = this.state.startyear.trim();
+			var endyear = this.state.endyear.trim();
+			if (!term || !startyear || !endyear) {
 				return;
 			}
 			// runSearch(term);
-			this.props.callbackParent(term);
-			this.setState({ term: '' });
+			console.log('this.state', this.state);
+			this.props.callbackParent(term, startyear, endyear);
+			this.setState({ term: '', startyear: '', endyear: '' });
 		},
 		render: function render() {
 			return React.createElement(
@@ -20050,6 +20086,16 @@
 						'div',
 						{ className: 'form-group col-sm-7' },
 						React.createElement('input', { type: 'text', value: this.state.term, onChange: this.handleTermChange, placeholder: 'Enter search terms..', className: 'form-control' })
+					),
+					React.createElement(
+						'div',
+						{ className: 'form-group col-sm-7' },
+						React.createElement('input', { type: 'text', value: this.state.startyear, onChange: this.handleStartYearChange, placeholder: 'Enter start year..', className: 'form-control' })
+					),
+					React.createElement(
+						'div',
+						{ className: 'form-group col-sm-7' },
+						React.createElement('input', { type: 'text', value: this.state.endyear, onChange: this.handleEndYearChange, placeholder: 'Enter end year..', className: 'form-control' })
 					),
 					React.createElement(
 						'div',
@@ -21262,18 +21308,19 @@
 		componentDidMount: function componentDidMount() {
 			console.log("MOUNTED");
 
-			var term = "obama";
-			axios.get("https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=f00d8dbd623a99f7d310810bf38cff90:9:74629258&q=" + term).then(function (results) {
-				// console.log(results)
-				// for (var i = 0; i < results.data.response.docs.length; i++) {
-				// 	console.log(results.data.response.docs[i].headline.main)
-				// }
-				this.setState({
-					articles: results.data.response.docs
-				});
-				console.log(this);
-				console.log(this.state);
-			}.bind(this));
+			// var term = "obama";
+			// axios.get("https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=f00d8dbd623a99f7d310810bf38cff90:9:74629258&q=" + term)
+			// 	.then(function(results){
+			// 		// console.log(results)
+			// 		// for (var i = 0; i < results.data.response.docs.length; i++) {
+			// 		// 	console.log(results.data.response.docs[i].headline.main)
+			// 		// }
+			// 		this.setState({
+			// 			articles: results.data.response.docs
+			// 		})
+			// 		console.log(this)
+			// 		console.log(this.state)
+			// }.bind(this))
 
 			/*Here we run our getGithubInfo function (from our helpers)*/
 			// helpers.getGithubInfo(this.props.params.username)
@@ -21289,8 +21336,13 @@
 			// 	// and not the "this" in the smaller context function.
 			// 	}.bind(this))
 		},
+		componentDidUpdate: function componentDidUpdate() {
+			console.log(this.props);
+		},
 		render: function render() {
-			var
+
+			console.log('this is rendering');
+			console.log("this.props in results.js", this.props);
 
 			// Map the repos and loop through
 			// When we map an array we effectively say... loop through each repo
@@ -21298,7 +21350,7 @@
 			// So in this case we are creating an array called "repos"
 			// which holds a series of HTML divs displaying lists.
 			// repos = [<div>...</div>, <div>...</div>, <div>...</div>, <div>...</div>]
-			articledata = this.state.articles.map(function (article, index) {
+			var articledata = this.props.info.map(function (article, index) {
 				return React.createElement(
 					'div',
 					null,
